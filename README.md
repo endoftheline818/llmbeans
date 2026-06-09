@@ -1,5 +1,4 @@
-# llmbeans
-
+# llmbeans 🫘
 Find the optimal way to run any LLM locally on your hardware.
 Interactive CLI for llmbeans — model scanner + config recommender.
 
