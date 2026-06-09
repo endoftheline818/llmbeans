@@ -1,7 +1,7 @@
 # llmbeans
 
 Find the optimal way to run any LLM locally on your hardware.
-
+```
 llmbeans/
 ├── main.py              # Entry point, TUI orchestration
 ├── hardware/
@@ -25,7 +25,7 @@ llmbeans/
     ├── app.py           # Textual app shell
     ├── screens.py       # Selection screens
     └── widgets.py       # Custom TUI components
-
+```
 ## Status
 
 v0.1.0 — in active development.
