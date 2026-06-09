@@ -37,6 +37,8 @@ Design decisions are documented in `adr/adr.md`.
 ## Install
 
 ```bash
+git clone git@github.com:tjax4376/llmbeans.git
+cd llmbeans
 pip install -e .
 ```
 
