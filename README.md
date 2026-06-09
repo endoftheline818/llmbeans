@@ -1,6 +1,16 @@
 # llmbeans
 
 Find the optimal way to run any LLM locally on your hardware.
+Interactive CLI for llmbeans — model scanner + config recommender.
+
+Guided terminal workflow:
+  1. Pick a hosting tool (llama-cli, lmstudio, omlx, ollama)
+  2. Select a model from the tool's default model directory
+  3. Auto-detect or select hardware profile
+  4. Choose quality mode (balanced / quality / speed)
+  5. Get recommendation with flags, estimates, and warnings
+  6. Write launch scripts
+
 ## Architecture
 
 Design decisions are documented in `adr/adr.md`.
