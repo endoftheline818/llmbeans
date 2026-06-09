@@ -7,4 +7,4 @@
 
 set -euo pipefail
 
-llama-cli -m /Users/tjax/.lmstudio/models/mlx-community/gemma-4-e4b-it-OptiQ-4bit -ngl 0 -c 32768 -t 8 -b 512 -tb 8 -ctk q8_0 -ctv q8_0  --temp 0.7 --repeat-penalty 1.1 --logit-bias
+llama-cli -m /Users/<user>/.lmstudio/models/mlx-community/gemma-4-e4b-it-OptiQ-4bit -ngl 0 -c 32768 -t 8 -b 512 -tb 8 -ctk q8_0 -ctv q8_0  --temp 0.7 --repeat-penalty 1.1 --logit-bias
