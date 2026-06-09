@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llmbeans"
+version = "0.1.0"
+description = "Find the optimal way to run any LLM locally on your hardware"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "gguf>=0.10.0",
+    "safetensors>=0.4.0",
+    "huggingface-hub>=0.24.0",
+    "rich>=13.7.0",
+]
+
+[project.scripts]
+llmbeans = "llmbeans.main:main"
+
+[tool.setuptools.packages.find]
+include = ["llmbeans*"]

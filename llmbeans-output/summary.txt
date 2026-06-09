@@ -1,0 +1,48 @@
+Model: gemma-4-e4b-it-OptiQ-4bit (gemma4)
+Architecture: gemma4
+Parameters: ~5.7B
+Quantization: AFFINE_4bit (4.0 bits)
+Size: 5.92 GB
+Context length: 131072 tokens
+Layers: 42
+
+Hardware: Mac16,1
+RAM: 16 GB ()
+GPU: Apple M4 (Unified memory)
+Memory bandwidth: 0 GB/s
+
+Hosting Tool: lmstudio
+
+Recommended Configuration:
+  gpu_layers: 42
+  ctx_size: 65536
+  n_threads: 10
+  batch_size: 512
+  kv_cache_type: q8_0
+
+Estimated Performance:
+  Tokens/second: ~0.0
+  VRAM usage: ~5.82 GB
+  GPU offload: 42/42 layers
+  Context: 65536 tokens
+  Threads: 10
+  Batch size: 512
+
+Command:
+  gpu_layers="42" ctx_size="65536" n_threads="10" batch_size="512" kv_cache_type="q8_0" lms server start
+
+Extra config:
+  {
+    "load": {
+      "gpu_layers": 42,
+      "ctx_size": 65536,
+      "n_threads": 10,
+      "batch_size": 512,
+      "flash_attention": false,
+      "cache_type_k": "q8_0",
+      "cache_type_v": "q8_0"
+    }
+  }
+
+Warnings:
+  - Model is much smaller than available unified memory. Consider increasing context length for better utilization.
