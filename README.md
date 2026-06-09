@@ -1,6 +1,24 @@
 # llmbeans
 
 Find the optimal way to run any LLM locally on your hardware.
+## Architecture
+
+Design decisions are documented in `adr/adr.md`.
+
+## Install
+
+```bash
+git clone git@github.com:tjax4376/llmbeans.git
+cd llmbeans
+pip install -e .
+```
+
+## Run
+
+```bash
+llmbeans
+```
+## Project folder structure description
 ```
 llmbeans/
 ├── main.py              # Entry point, TUI orchestration
@@ -29,21 +47,3 @@ llmbeans/
 ## Status
 
 v0.1.0 — in active development.
-
-## Architecture
-
-Design decisions are documented in `adr/adr.md`.
-
-## Install
-
-```bash
-git clone git@github.com:tjax4376/llmbeans.git
-cd llmbeans
-pip install -e .
-```
-
-## Run
-
-```bash
-llmbeans
-```
