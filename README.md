@@ -16,11 +16,49 @@ Design decisions are documented in `adr/adr.md`.
 
 ## Install
 
+python --version
+pip --version
+git --version
+
+
+
+### Macbook
 ```bash
-git clone git@github.com:tjax4376/llmbeans.git
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" # install homebrew if not installed
+brew install python@3.12
+brew install git
+git clone https://github.com/tjax4376/llmbeans
+cd llmbeans
+python3 -m pip install --upgrade pip
+pip install -e .
+```
+
+### Linux
+```
+sudo apt update
+sudo apt install -y python3 python3-pip git
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+git clone https://github.com/tjax4376/llmbeans
+cd llmbeans
+python3 -m pip install --upgrade pip
+pip install -e .
+```
+
+### Windows
+```Powershell
+Start PowerShell:
+winget install --id Python.Python.3.12 -e
+winget install --id Git.Git -e --source winget
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+python -m ensurepip --upgrade
+python -m pip install --upgrade pip
+git clone https://github.com/tjax4376/llmbeans
 cd llmbeans
 pip install -e .
 ```
+
 
 ## Run
 
