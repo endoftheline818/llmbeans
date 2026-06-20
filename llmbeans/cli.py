@@ -669,19 +669,18 @@ def main():
             written = write_scripts(rec, model, output_dir)
             console.print()
             for ftype, fpath in written.items():
-                console.print(f"  [green]{ftype} script[/green] saved to: {fpath}")
+                console.print(f"  [green]{ftype}[/green] saved to: {fpath}")
         except Exception as e:
             console.print(f"[red]Error writing scripts: {e}[/red]")
 
-    # Always save summary
-    try:
-        summary_path = os.path.join("llmbeans-output", "summary.txt")
-        os.makedirs("llmbeans-output", exist_ok=True)
-        with open(summary_path, "w") as f:
-            f.write(summary)
-        console.print(f"  [green]Summary[/green] saved to: {os.path.abspath(summary_path)}")
-    except Exception:
-        pass
+        try:
+            summary_path = os.path.join(output_dir, "summary.txt")
+            os.makedirs(output_dir, exist_ok=True)
+            with open(summary_path, "w") as f:
+                f.write(summary)
+            console.print(f"  [green]summary[/green] saved to: {os.path.abspath(summary_path)}")
+        except Exception as e:
+            console.print(f"[red]Error writing summary: {e}[/red]")
 
     console.print()
     console.print("[bold green]Done![/bold green] Happy inferencing.")
