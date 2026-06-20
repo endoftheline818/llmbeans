@@ -1,4 +1,3 @@
-# llmbeans/cli.py
 """Interactive CLI for llmbeans — model scanner + config recommender.
 
 Guided terminal workflow:
@@ -225,7 +224,30 @@ def prompt_model_selection(tool: str) -> str:
 
 
 def _prompt_custom_path() -> str:
-    """Prompt for a manual model path."""
+    """Scan the current working directory first, then fall back to manual path entry."""
+    cwd = Path.cwd()
+    cwd_models = _scan_models_in_dir(str(cwd))
+
+    if cwd_models:
+        console.print(f"\n[green]Current directory scan: {len(cwd_models)} model(s) found[/green]")
+        for i, m in enumerate(cwd_models, 1):
+            display_name = Path(m["path"]).name
+            console.print(
+                f"  [bold]{i}.[/bold] {display_name} "
+                f"[dim]({m['format']}, {m['size_gb']:.2f} GB)[/dim]"
+            )
+        console.print(f"  [bold]{len(cwd_models) + 1}.[/bold] [yellow]Enter a different path manually[/yellow]")
+
+        while True:
+            choice = IntPrompt.ask("\nSelect model (number)", default=1)
+            if 1 <= choice <= len(cwd_models):
+                resolved = _resolve_model_dir(Path(cwd_models[choice - 1]["path"]))
+                return str(resolved)
+            if choice == len(cwd_models) + 1:
+                break
+            console.print("[red]Invalid selection.[/red]")
+
+    # Manual path fallback
     while True:
         raw = Prompt.ask("[bold]Model path[/bold]").strip()
         if not raw:
