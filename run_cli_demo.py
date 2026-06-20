@@ -13,16 +13,19 @@ from io import StringIO
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Change to the llmbeans directory
-os.chdir('/Users/tjax/llmbeans')
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def run_cli_demo():
     """Run the CLI with mocked inputs and return the output."""
     print("Running llmbeans CLI demo with mocked inputs...")
     print("=" * 60)
 
+    # Use this actual script file as a placeholder path so os.path.exists passes
+    valid_placeholder_path = os.path.abspath(__file__)
+
     # Mock user inputs for the prompts
     mock_inputs = [
-        '/fake/path/to/model.gguf',  # Model path
+        valid_placeholder_path,      # Model path (must exist on disk)
         'y',                         # Use auto-detected hardware
         '1',                         # Select first tool (llamacpp)
         '1'                          # Select first quality mode (balanced)
@@ -41,7 +44,6 @@ def run_cli_demo():
             print(value)  # Echo the value on a new line for clarity
             return value
         except StopIteration:
-            # If we run out of inputs, return empty string or default
             return ''
 
     # Capture stdout
@@ -49,85 +51,60 @@ def run_cli_demo():
     sys.stdout = captured_output = StringIO()
 
     try:
-        # Import and run main
-        import cli
+        # Setup mock data structures
+        from llmbeans.models.scanner import ModelInfo, ModelFormat
+        mock_model_info = ModelInfo(
+            name='demo-model',
+            format=ModelFormat.GGUF,
+            architecture='llama',
+            parameter_count=7.0,
+            quant_method='Q4_K_M',
+            quant_bits=4.5,
+            context_length=32768,
+            hidden_size=4096,
+            intermediate_size=11008,
+            num_layers=32,
+            num_attention_heads=32,
+            num_key_value_heads=8,
+            vocab_size=32000,
+            model_size_gb=4.5,
+            estimated_vram_gb=4.5,
+            source_path=valid_placeholder_path,
+            is_remote=False
+        )
 
-        # We need to mock several functions to avoid requiring real files/hardware
-        with patch('builtins.input', side_effect=mock_input), \
-             patch('llmbeans.cli.scan_model') as mock_scan_model, \
-             patch('llmbeans.cli.detect_hardware') as mock_detect_hardware, \
-             patch('llmbeans.cli.get_hardware_profiles') as mock_get_hardware_profiles, \
-             patch('llmbeans.cli.get_available_tools') as mock_get_available_tools, \
-             patch('llmbeans.cli.recommend') as mock_recommend, \
-             patch('llmbeans.cli.generate_summary') as mock_generate_summary, \
-             patch('llmbeans.cli.write_scripts') as mock_write_scripts:
+        from llmbeans.hardware.detector import HardwareProfile
+        mock_hardware_profile = HardwareProfile(
+            os='darwin',
+            cpu_cores=12,
+            ram_total_gb=24.0,
+            ram_free_gb=16.0,
+            gpu_vendor='Apple',
+            gpu_vram_gb=None,
+            gpu_name='Apple M4 Pro',
+            is_apple_silicon=True,
+            unified_memory=True,
+            metal_supported=True,
+            disk_is_ssd=True,
+            laptop_model='MacBook Pro',
+            memory_bandwidth_gbps=273.0
+        )
 
-            # Setup mock return values
-            # Mock model info
-            from llmbeans.models.scanner import ModelInfo
-            mock_model_info = ModelInfo(
-                name='demo-model',
-                architecture='llama',
-                quantization='Q4_K_M',
-                bits=4.5,
-                size_gb=4.5,
-                context_length=32768,
-                num_layers=32,
-                embedding_dim=4096,
-                num_attention_heads=32,
-                num_key_value_heads=8,
-                vocab_size=32000,
-                model_size_gb=4.5,
-                estimated_vram_gb=4.5,
-                source_path='/fake/path/to/model.gguf',
-                is_remote=False,
-                format=None  # Will be set by scanner, but we'll mock it
-            )
-            mock_scan_model.return_value = mock_model_info
+        from llmbeans.recommenders.engine import Recommendation
+        mock_recommendation = Recommendation(
+            hosting_tool='llamacpp',
+            context_length=8192,
+            batch_size=512,
+            thread_count=12,
+            gpu_offload_layers=32,
+            estimated_tok_per_sec=45.0,
+            estimated_vram_usage_gb=3.6,
+            estimated_ram_usage_gb=5.2,
+            warnings=['Model is smaller than available unified memory, consider increasing context length for better utilization.']
+        )
 
-            # Mock hardware info
-            from llmbeans.hardware.detector import HardwareInfo
-            mock_hardware_info = HardwareInfo(
-                id='m4-pro',
-                name='Apple M4 Pro',
-                year=2024,
-                ram_gb=24,
-                ram_type='LPDDR5X',
-                cpu_cores=12,
-                cpu_threads=12,
-                gpu_type='apple_silicon',
-                gpu_name='Apple M4 Pro',
-                gpu_vram_gb=None,  # Unified memory
-                metal=True,
-                cuda=False,
-                cuda_compute=None,
-                vram_bandwidth_gbps=None,
-                ssd_recommended=True,
-                category='laptop'
-            )
-            mock_detect_hardware.return_value = mock_hardware_info
-            mock_get_hardware_profiles.return_value = []  # Empty to force auto-detect path
-
-            # Mock available tools
-            mock_get_available_tools.return_value = ['llamacpp', 'ollama', 'mlx', 'vllm', 'lmstudio']
-
-            # Mock recommendation
-            from llmbeans.recommenders.engine import Recommendation
-            mock_recommendation = Recommendation(
-                hosting_tool='llamacpp',
-                context_length=8192,
-                batch_size=512,
-                thread_count=12,
-                gpu_offload_layers=32,
-                estimated_tok_per_sec=45.0,
-                estimated_vram_usage_gb=3.6,
-                estimated_ram_usage_gb=5.2,
-                warnings=['Model is smaller than available unified memory, consider increasing context length for better utilization.']
-            )
-            mock_recommend.return_value = mock_recommendation
-
-            # Mock summary generation
-            mock_generate_summary.return_value = """Model: demo-model (llama)
+        # Mock summary text output
+        mock_summary_text = """Model: demo-model (llama)
 Architecture: llama
 Quantization: Q4_K_M (4.5 bits)
 Size: 4.5 GB
@@ -162,24 +139,44 @@ Estimated Performance:
 Warnings:
   - Model is smaller than available unified memory, consider increasing context length for better utilization."""
 
-            # Mock script writing
-            mock_write_scripts.return_value = {
-                'shell': '/Users/tjax/llmbeans-output/run.sh',
-                'batch': '/Users/tjax/llmbeans-output/run.bat'
-            }
+        output_dir = os.path.abspath('./llmbeans-output')
+        mock_scripts_dict = {
+            'shell': os.path.join(output_dir, 'run.sh'),
+            'batch': os.path.join(output_dir, 'run.bat')
+        }
 
-            # Run the main function
+        # Open the patch context manager targeting both potential namespaces
+        with patch('builtins.input', side_effect=mock_input), \
+             patch('cli.scan_model', create=True, return_value=mock_model_info), \
+             patch('cli.detect_hardware', create=True, return_value=mock_hardware_profile), \
+             patch('cli.get_hardware_profiles', create=True, return_value=[]), \
+             patch('cli.get_available_tools', create=True, return_value=['llamacpp', 'ollama', 'mlx', 'vllm', 'lmstudio']), \
+             patch('cli.recommend', create=True, return_value=mock_recommendation), \
+             patch('cli.generate_summary', create=True, return_value=mock_summary_text), \
+             patch('cli.write_scripts', create=True, return_value=mock_scripts_dict), \
+             patch('llmbeans.cli.scan_model', create=True, return_value=mock_model_info), \
+             patch('llmbeans.cli.detect_hardware', create=True, return_value=mock_hardware_profile), \
+             patch('llmbeans.cli.get_hardware_profiles', create=True, return_value=[]), \
+             patch('llmbeans.cli.get_available_tools', create=True, return_value=['llamacpp', 'ollama', 'mlx', 'vllm', 'lmstudio']), \
+             patch('llmbeans.cli.recommend', create=True, return_value=mock_recommendation), \
+             patch('llmbeans.cli.generate_summary', create=True, return_value=mock_summary_text), \
+             patch('llmbeans.cli.write_scripts', create=True, return_value=mock_scripts_dict):
+
+            # Safely import the module inside the active mock session
+            import cli
+
+            # Run the main engine pipeline
             try:
                 cli.main()
             except SystemExit:
-                pass  # Expected when main completes normally
+                pass  # Clean exit handling
             except Exception as e:
-                print(f"[Demo] Unexpected error: {e}")
+                print(f"[Demo] Unexpected inner error: {e}")
                 import traceback
                 traceback.print_exc()
 
     finally:
-        # Restore stdout
+        # Restore normal stdout streaming to terminal
         output = captured_output.getvalue()
         sys.stdout = old_stdout
 
