@@ -10,6 +10,9 @@ def generate_flags(model, hardware, gpu_offload_layers, context_length,
     total_layers = model.num_layers
 
     # GPU offload (-ngl): number of layers to offload to GPU
+    # Bug fix: hardware.cuda was always False for auto-detected NVIDIA systems
+    # because from_detection() hardcoded cuda=False. Now from_detection() sets
+    # cuda=True when gpu_vendor=="nvidia", so this condition fires correctly.
     if hardware.cuda or hardware.metal:
         flags["-ngl"] = str(gpu_offload_layers)
     else:
